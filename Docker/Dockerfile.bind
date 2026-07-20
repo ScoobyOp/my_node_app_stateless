@@ -1,0 +1,41 @@
+FROM node:24
+
+WORKDIR /workspace
+
+COPY  package*.json ./
+# This line install, node_module dependencies in the image, so image is size increased. so we are commenting it
+# RUN npm install
+
+# this below command runs npm install and install dependencies in the docker volume, because in the compose-bind.yml
+# we have provided the named volume. this will allocate docker volume to the container 
+# node modules are stored in the docker volume instaed of image/running container. so image is reduced
+# CMD ["npm", "run", "docker:start"]
+# only on the first time , it is slow because it has to install dependencies
+# from second time on ward's it will be fast, npm install is instant and it will load node modules from mounted docker volume.
+
+CMD ["sh", "-c", "npm install && npm run docker:start"]
+
+# To build this we have to use this below command, since we have named the dockefile. 
+# And we have to force build it
+# here . refer's to current directory/path of the work dire, where docker file is present.
+
+# docker build -f Dockerfile.bind -t <nameoftheimage> .
+
+# if docker is not named we can use the below command
+
+# docker build .
+
+# To run image without docker compose bind.yml, we can use below docker command for that, if it is present dont use. 
+
+# which will bind the volume from source destination
+# paste this in window's powershell
+# api-withoutsource:latest  is name of the image that was created by using this docker file.
+# api_without_source is name of the docker container which run's this image
+
+# docker run -it `
+# --name api_without_source `
+#  -w /app `
+#  -v ${PWD}:/app `
+# -v app-nodemodules:/app/node_modules `
+#  -p 8002:8002 `
+#  api-withoutsource:latest 

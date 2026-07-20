@@ -1,0 +1,43 @@
+services:
+  db_postgres:
+    image: postgres:17
+    container_name: postgres
+    # we can expose this port , only when we connect the db from localhost or
+    # backend application outside the container connecting the postgres, that time we can expose.
+    # but now both backend app and postgress run's inside the container network, they communicate each other.
+    # we no need to expose this below port, BE app, connects automatically
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: venu
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: user_stateless_record
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+  # In the below service, docker file will not have source code in the image, instead , it get's volume mounted using this below service.
+  # ie .:/workspace, here . represent current loctaion : /workspace is the location in conatiner
+  # ie currentlocation:locationincontainer
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile.bind
+    container_name: node_app
+    # we have include depands on, because the application service has to run, only after postgres is up and running
+    # so this service wait for the postgres to run and then only it will execute
+    depends_on:
+      - db_postgres
+    ports:
+      - 8002:8002
+    env_file:
+      - .env
+    # here we are create a volume in the docker with the name app_volume
+    # and mounting that docker volume to the source code location , basically it is mounted there
+    # so node_modules will be part of docker, even when container get deleted, no need to install modules again, it will be there in the docker always
+    volumes:
+      - .:/workspace
+      - app_volume:/workspace/node_modules
+
+volumes:
+  postgres_volume:
+  app_volume:

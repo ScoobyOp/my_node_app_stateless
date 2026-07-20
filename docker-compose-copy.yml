@@ -1,0 +1,50 @@
+services:
+  postgres:
+   image: postgres:17
+   restart: always
+   environment:
+    POSTGRES_DB: user_stateless_record
+    POSTGRES_PASSWORD: admin
+    POSTGRES_USER: venu
+    # this env variable tell, wheather it is development image or production image
+    # which can also changed directly through docker inline command if u are running for production
+    NODE_ENV: development
+   # we can expose this port , only when we connect the db from localhost or
+   # backend application outside the container connecting the postgres, that time we can expose.
+   # but now both backend app and postgress run's inside the container network, they communicate each other.
+   # we no need to expose this below port, BE app, connects automatically  
+   #  ports: 
+   #   - 5432:5432
+   volumes:
+    - my_db:/var/lib/postgresql/data
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.copy
+    depends_on:
+      - postgres
+    # we have to expose this port , because host tries to hit the BE application running inside the container
+    # network of host and container private network , communicate only through port mapping, which is written below.
+    ports:
+      - 8002:8002
+    env_file:
+      - .env
+
+  # this will not work , because drizzle studio always connect from host machine browser to studio backend, 
+  # we cannot connect from the docker container. not possible it is limitation from drizzle studio. 
+ 
+  # studio:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.copy
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - 4983:4983
+  #   env_file:
+  #     - .env
+  #   command: ["npx", "drizzle-kit", "studio", "--host=0.0.0.0", "--port=4983"]
+
+volumes:
+ my_db:

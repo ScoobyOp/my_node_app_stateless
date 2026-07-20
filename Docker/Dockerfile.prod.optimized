@@ -1,0 +1,37 @@
+############################################
+# Builder
+############################################
+
+FROM node:24 AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+# This below command will be placed always at the last , 
+# because it removes the devdependencies from the node_modules
+# if it is placed before the RUN npm test or Run npm build, the build may fail
+# because there will not be any devdependencies, it is very ideal that, it should be 
+# always placed at the last
+
+RUN npm prune --omit=dev
+
+############################################
+# Runner
+############################################
+
+FROM node:24-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app ./
+
+EXPOSE 8002
+
+CMD ["node", "src/index.js"]

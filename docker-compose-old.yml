@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: venu
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: user_stateless_record
+    volumes:
+      - my_db:/var/lib/postgresql/data
+volumes:
+  my_db:

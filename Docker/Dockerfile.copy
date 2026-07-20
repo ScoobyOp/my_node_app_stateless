@@ -1,0 +1,42 @@
+FROM node:24
+
+WORKDIR /workspace
+
+COPY package*.json ./
+
+RUN npm install
+
+# Copies entire source code image, to run the application inside the container
+COPY . .
+
+#we have to expose the port of the node js , as it is running inside the container network, 
+# Because host machine will not able identify this prot  
+EXPOSE 3000
+
+# only to start the node js application
+# CMD ["npm", "start"]
+
+# start application as well schema for the db using postgress running in the docker
+CMD ["npm", "run", "docker:start"]
+
+# To build this we have to use this below command, since we have named the dockefile. 
+# And we have to force build it
+# here . refer's to current directory/path of the work dire, where docker file is present.
+
+# docker build -f Dockerfile.copy -t <nameoftheimage> .
+
+# if docker is not named we can use the below command
+
+# docker build .
+
+# To run image without docker compose copy.yml, we can use below docker command for that, if it is present dont use. 
+
+# which will have tge source code in the image itself. because it is already copied to image.
+# paste this in window's powershell
+# api-withsource:latest is name of the image that was created by using this docker file.
+# api_with_source is name of the docker container which run's this image.
+
+#  docker run -it `                      
+# --name api_with_source `    
+#  -p 8002:8002 `     
+#  api-withsource:latest ` 

@@ -1,0 +1,9 @@
+FROM node:24
+
+WORKDIR /workspace
+
+COPY package*.json ./
+
+RUN npm install
+
+CMD ["npm", "run", "docker:start"]
