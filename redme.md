@@ -46,8 +46,8 @@ Server will not have control over the created token, has it shared with the user
 
 
 # Express Stateless Authentication
-
-## Run Development
+## Below are docker command
+## Run Development 
 
 docker compose -f docker-compose.dev.yml up --build
 
