@@ -6,7 +6,7 @@ const router = express.Router()
 // Health route to check the status of the api
 router.get("/health", (req, res) => {
     res.status(200).json({
-        status: "UP"
+        status: "Api is up and running"
     });
 });
 // here custom middleware function is added to the routes, get and patch  "/", where it give user details 
